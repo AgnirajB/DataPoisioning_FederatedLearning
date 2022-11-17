@@ -27,7 +27,7 @@ class Server(object):
         self.goal = args.goal
         self.time_threthold = args.time_threthold
         self.save_folder_name = args.save_folder_name
-        self.top_cnt = 100
+        self.top_cnt = 50
 
         self.clients = []
         self.selected_clients = []

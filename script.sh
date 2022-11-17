@@ -13,7 +13,7 @@ do
         cd ./dataset
         python generate_mnist.py iid balance - $clients
         cd ../system
-        python main.py -data mnist -m cnn -algo $algorithm -gr 1 -did 0 -go cnn --num_clients $clients
+        python main.py -data mnist -m cnn -algo $algorithm -gr 100 -did 0 -go cnn --num_clients $clients
         cd ../
    done
    # or do whatever with individual element of the array
