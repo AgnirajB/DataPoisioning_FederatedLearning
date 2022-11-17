@@ -2,3 +2,5 @@
 *.pt
 *.npz
 dataset/mnist/*
+*.h5
+*.npz
