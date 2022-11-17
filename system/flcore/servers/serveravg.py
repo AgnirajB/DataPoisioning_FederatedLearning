@@ -20,6 +20,7 @@ class FedAvg(Server):
 
 
     def train(self):
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@",self.global_rounds)
         for i in range(self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()

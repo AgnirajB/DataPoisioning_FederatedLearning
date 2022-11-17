@@ -8,6 +8,7 @@ import warnings
 import numpy as np
 from torch.nn.functional import dropout
 import torchvision
+from csv import DictWriter
 
 from flcore.servers.serveravg import FedAvg
 from flcore.servers.serverperavg import PerAvg
@@ -117,7 +118,7 @@ def run(args):
     
 
     # Global average
-    average_data(dataset=args.dataset, 
+    mean, std = average_data(dataset=args.dataset, 
                 algorithm=args.algorithm, 
                 goal=args.goal, 
                 times=args.times, 
@@ -127,6 +128,7 @@ def run(args):
 
     reporter.report()
 
+    return mean, std
 
 if __name__ == "__main__":
     total_start = time.time()
@@ -142,7 +144,7 @@ if __name__ == "__main__":
     parser.add_argument('-nb', "--num_classes", type=int, default=10)
     parser.add_argument('-m', "--model", type=str, default="cnn")
     parser.add_argument('-p', "--predictor", type=str, default="cnn")
-    parser.add_argument('-lbs', "--batch_size", type=int, default=10)
+    parser.add_argument('-lbs', "--batch_size", type=int, default=16)
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005,
                         help="Local learning rate")
     parser.add_argument('-gr', "--global_rounds", type=int, default=1000)
@@ -210,9 +212,33 @@ if __name__ == "__main__":
     print("Dataset: {}".format(args.dataset))
     print("Local model: {}".format(args.model))
     print("Using device: {}".format(args.device))
+ 
+    field_names = ['algorithm', 'batch_size', 'local_steps', 'local_learning_rate', 'num_clients', 'join_ratio', 'client_drop_rate', 'time_select', 'time_threthold', 'global_rounds', 'times', 'dataset', 'model', 'device', 'mean_acc', 'std_dev']
 
     if args.device == "cuda":
         print("Cuda device id: {}".format(os.environ["CUDA_VISIBLE_DEVICES"]))
     print("=" * 50)
 
-    run(args)
+    mean, std = run(args)
+
+    dict = {"algorithm": args.algorithm,
+    "batch_size": args.batch_size,
+    "local_steps": args.local_steps,
+    "local_learning_rate": args.local_learning_rate,
+    "num_clients": args.num_clients,
+    "join_ratio": args.join_ratio,
+    "client_drop_rate": args.client_drop_rate,
+    "time_select": args.time_select,
+    "time_threthold": args.time_threthold,
+    "global_rounds": args.global_rounds,
+    "times": args.times,
+    "dataset": args.dataset,
+    "model": args.model,
+    "device": args.device,
+    "mean_acc": mean,
+    "std_dev": std
+    }
+    with open('../results.csv', 'a+') as f:
+        dictwriter_object = DictWriter(f, fieldnames=field_names)
+        dictwriter_object.writerow(dict)
+        f.close()
