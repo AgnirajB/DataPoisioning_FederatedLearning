@@ -4,3 +4,4 @@
 dataset/mnist/*
 *.h5
 *.npz
+*.pt

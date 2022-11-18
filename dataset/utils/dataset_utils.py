@@ -9,13 +9,15 @@ train_size = 0.75 # merge original training set and test set, then split it manu
 least_samples = batch_size / (1-train_size) # least samples for each client
 alpha = 0.1 # for Dirichlet distribution
 
-def check(config_path, train_path, test_path, num_clients, num_classes, niid=False, 
-        balance=True, partition=None):
+def check(config_path, train_path, test_path, num_clients, num_classes, percent_of_mal_nodes, percent_of_mal_data, niid=False, 
+        balance=True, partition=None, ):
     # check existing dataset
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             config = ujson.load(f)
         if config['num_clients'] == num_clients and \
+            config['percent_of_mal_nodes'] == percent_of_mal_nodes and \
+            config['percent_of_mal_data'] == percent_of_mal_data and \
             config['num_classes'] == num_classes and \
             config['non_iid'] == niid and \
             config['balance'] == balance and \
@@ -151,10 +153,12 @@ def split_data(X, y):
 
     return train_data, test_data
 
-def save_file(config_path, train_path, test_path, train_data, test_data, num_clients, 
+def save_file(config_path, train_path, test_path, train_data, test_data, num_clients,  percent_of_mal_nodes, percent_of_mal_data, 
                 num_classes, statistic, niid=False, balance=True, partition=None):
     config = {
         'num_clients': num_clients, 
+        'percent_of_mal_nodes': percent_of_mal_nodes,
+        'percent_of_mal_data': percent_of_mal_data,
         'num_classes': num_classes, 
         'non_iid': niid, 
         'balance': balance, 
