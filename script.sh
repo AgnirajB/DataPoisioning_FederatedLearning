@@ -4,8 +4,9 @@ declare -a algorithms=("FedAvg" "FedProx" "FedProto")
 # declare -a mal_node_perc=(10 20 30)
 # declare -a mal_data_perc=(10 20 30)
 # declare -a mal_data_perc=(0.1)
-declare -a mal_node_perc=(0 10 20 30)
-declare -a mal_data_perc=(1 3 5 10)
+# declare -a mal_node_perc=(0 10 20 30)
+declare -a mal_node_perc=(20 30)
+declare -a mal_data_perc=(1 5 10 15)
 
 ## now loop through the above array
 for clients in ${clients_arr[@]}

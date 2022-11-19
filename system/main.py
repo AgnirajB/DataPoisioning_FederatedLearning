@@ -147,7 +147,7 @@ if __name__ == "__main__":
     parser.add_argument('-lbs', "--batch_size", type=int, default=16)
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005,
                         help="Local learning rate")
-    parser.add_argument('-gr', "--global_rounds", type=int, default=250)
+    parser.add_argument('-gr', "--global_rounds", type=int, default=200)
     parser.add_argument('-ls', "--local_steps", type=int, default=1)
     parser.add_argument('-algo', "--algorithm", type=str, default="FedAvg")
     parser.add_argument('-jr', "--join_ratio", type=float, default=1.0,
@@ -218,7 +218,9 @@ if __name__ == "__main__":
  
     field_names = ['algorithm', 'batch_size', 'local_steps', 'local_learning_rate', 'num_clients', 'mal_node_perc', 'mal_data_perc',
      'join_ratio', 'client_drop_rate', 'time_select', 'time_threthold', 'global_rounds', 'times',
-      'dataset', 'model', 'device', 'mean_acc', 'std_dev']
+      'dataset',
+    #    'model', 
+       'device', 'mean_acc', 'std_dev']
 
     if args.device == "cuda":
         print("Cuda device id: {}".format(os.environ["CUDA_VISIBLE_DEVICES"]))
@@ -241,12 +243,12 @@ if __name__ == "__main__":
         "global_rounds": args.global_rounds,
         "times": args.times,
         "dataset": args.dataset,
-        "model": args.model,
+        # "model": args.model,
         "device": args.device,
         "mean_acc": mean,
         "std_dev": std
         }
-    with open('/home/rmekala/demo_exp/sysml/DataPoisioning_FederatedLearning/results.csv', 'a+') as f:
+    with open('/home/rmekala/demo_exp/sysml/FL2/results.csv', 'a+') as f:
         dictwriter_object = DictWriter(f, fieldnames=field_names)
         dictwriter_object.writerow(dict)
         f.close()

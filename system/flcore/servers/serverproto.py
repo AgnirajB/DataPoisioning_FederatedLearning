@@ -53,7 +53,7 @@ class FedProto(Server):
             print('-'*50, self.Budget[-1])
 
             if i>0:
-                self.done = self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt)
+                self.done = self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt) or (i == self.global_rounds+1)
             i += 1
 
         print("\nBest global accuracy.")

@@ -94,9 +94,27 @@ def modify_data(train_data, test_data, num_clients, mal_nodes, percet_of_malicio
     criterion = nn.CrossEntropyLoss()
 
 
-    dlg_attacker = GradientInversion_Attack(
-        net, (1, 28, 28), lr=1.0, log_interval=0, num_iteration=100, distancename="l2", early_stopping=25
-        )
+    # dlg_attacker = GradientInversion_Attack(
+    #     net, (1, 28, 28), lr=1.0, log_interval=0, num_iteration=100, distancename="l2", early_stopping=25
+    #     )
+
+    gradinversion = GradientInversion_Attack(
+        net,
+        (1, 28, 28),
+        num_iteration=250,
+        early_stopping=25,
+        lr=1e2,
+        log_interval=0,
+        optimizer_class=torch.optim.SGD,
+        distancename="l2",
+        optimize_label=False,
+        bn_reg_layers=[],
+        group_num=5,
+        tv_reg_coef=0.00,
+        l2_reg_coef=0.0001,
+        bn_reg_coef=0.001,
+        gc_reg_coef=0.001,
+    )
 
     for i, data_dict in enumerate(train_data):
         x = data_dict['x']
@@ -106,14 +124,19 @@ def modify_data(train_data, test_data, num_clients, mal_nodes, percet_of_malicio
             continue
 
         num_mal_samples = math.floor(len(x)* percet_of_malicious_data/100.0)
-        malicious_indices = random.sample(range(0, num_mal_samples), num_mal_samples)
+        malicious_indices = set()
         
         # print("++++++++++++++++++++++++++", x.shape, x[0])
 
 
         # print("++++++++++++++++++++++++++", x_mal.shape, x_mal[0])
 
-        for i in malicious_indices:
+        mal_count = 0
+        while mal_count !=num_mal_samples:
+            i = random.sample(range(0, len(x)), 1)[0]
+            if i in malicious_indices:
+                continue
+            malicious_indices.add(i)
             # print("----------------", len(malicious_indices))
 
             x_mal = torch.Tensor(x[i:i+1])
@@ -126,7 +149,13 @@ def modify_data(train_data, test_data, num_clients, mal_nodes, percet_of_malicio
             received_gradients = [cg.detach() for cg in received_gradients]
 
             # print(x[i])
-            x[i] = minmax_scale(dlg_attacker.attack(received_gradients)[0].detach().numpy().squeeze(), feature_range=(-1,1))
+            try:
+                x[i] = gradinversion.attack(received_gradients)[0].detach().numpy().squeeze()
+                mal_count+=1
+                # print(mal_count)
+            except Exception as err:
+                # print("------",i, err)
+                pass
             # print(x[i])
             # print(x[i].shape)
 
