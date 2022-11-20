@@ -91,30 +91,30 @@ def modify_data(train_data, test_data, num_clients, mal_nodes, percet_of_malicio
     malicious_nodes = random.sample(range(0, num_clients), mal_nodes)
     net = FedAvgCNN(in_features=1, num_classes=10, dim=1024).to('cpu')
 
-    criterion = nn.CrossEntropyLoss()
+    # criterion = nn.CrossEntropyLoss()
 
 
-    # dlg_attacker = GradientInversion_Attack(
-    #     net, (1, 28, 28), lr=1.0, log_interval=0, num_iteration=100, distancename="l2", early_stopping=25
-    #     )
+    # # dlg_attacker = GradientInversion_Attack(
+    # #     net, (1, 28, 28), lr=1.0, log_interval=0, num_iteration=100, distancename="l2", early_stopping=25
+    # #     )
 
-    gradinversion = GradientInversion_Attack(
-        net,
-        (1, 28, 28),
-        num_iteration=250,
-        early_stopping=25,
-        lr=1e2,
-        log_interval=0,
-        optimizer_class=torch.optim.SGD,
-        distancename="l2",
-        optimize_label=False,
-        bn_reg_layers=[],
-        group_num=5,
-        tv_reg_coef=0.00,
-        l2_reg_coef=0.0001,
-        bn_reg_coef=0.001,
-        gc_reg_coef=0.001,
-    )
+    # gradinversion = GradientInversion_Attack(
+    #     net,
+    #     (1, 28, 28),
+    #     num_iteration=250,
+    #     early_stopping=25,
+    #     lr=1e2,
+    #     log_interval=0,
+    #     optimizer_class=torch.optim.SGD,
+    #     distancename="l2",
+    #     optimize_label=False,
+    #     bn_reg_layers=[],
+    #     group_num=5,
+    #     tv_reg_coef=0.00,
+    #     l2_reg_coef=0.0001,
+    #     bn_reg_coef=0.001,
+    #     gc_reg_coef=0.001,
+    # )
 
     for i, data_dict in enumerate(train_data):
         x = data_dict['x']
@@ -138,24 +138,48 @@ def modify_data(train_data, test_data, num_clients, mal_nodes, percet_of_malicio
                 continue
             malicious_indices.add(i)
             # print("----------------", len(malicious_indices))
+            print("Old y[i] --- ", y[i])
+            val = int(y[i])
+            if val == 0:
+                val = 9
+            elif val == 1:
+                val = 3
+            elif val == 2:
+                val = 7
+            elif val == 3:
+                val = 9
+            elif val == 4:
+                val = 9
+            elif val == 5:
+                val = 9
+            elif val == 6:
+                val = 8
+            elif val == 7:
+                val = 9
+            elif val == 8:
+                val = 6
+            elif val == 9:
+                val = 3
 
-            x_mal = torch.Tensor(x[i:i+1])
-            y_mal = torch.Tensor(y[i:i+1]).type(torch.long)
+            y[i]=float(val)
+            print("Modified y[i] --- ", y[i])
+            # x_mal = torch.Tensor(x[i:i+1])
+            # y_mal = torch.Tensor(y[i:i+1]).type(torch.long)
             
 
-            pred = net(x_mal)
-            loss = criterion(pred, y_mal)
-            received_gradients = torch.autograd.grad(loss, net.parameters())
-            received_gradients = [cg.detach() for cg in received_gradients]
+            # pred = net(x_mal)
+            # loss = criterion(pred, y_mal)
+            # received_gradients = torch.autograd.grad(loss, net.parameters())
+            # received_gradients = [cg.detach() for cg in received_gradients]
 
             # print(x[i])
-            try:
-                x[i] = gradinversion.attack(received_gradients)[0].detach().numpy().squeeze()
-                mal_count+=1
-                # print(mal_count)
-            except Exception as err:
-                # print("------",i, err)
-                pass
+            # try:
+            #     x[i] = gradinversion.attack(received_gradients)[0].detach().numpy().squeeze()
+            #     mal_count+=1
+            #     # print(mal_count)
+            # except Exception as err:
+            #     # print("------",i, err)
+            #     pass
             # print(x[i])
             # print(x[i].shape)
 
