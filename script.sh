@@ -19,7 +19,7 @@ do
          do
             echo $clients
             echo $algorithm
-            /home/rmekala/anaconda3/envs/snoopy/bin/python -u generate_mnist.py iid balance - $clients $mp $md
+            /home/rmekala/anaconda3/envs/snoopy/bin/python -u generate_mnist.py noniid - dir $clients $mp $md
             cd ./system
             /home/rmekala/anaconda3/envs/snoopy/bin/python -u main.py -data mnist -m cnn -algo $algorithm -gr 100 -did 0 -go cnn --num_clients $clients -mp $mp -md $md
             cd ../
